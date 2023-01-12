@@ -48,6 +48,7 @@ local desyncSideSetting = ui.get("Rage", "Anti-aim", "General", "Fake yaw direct
 local slideWalkSetting = ui.get("Misc", "General", "Movement", "Leg movement")
 local hitChanceSetting = ui.get_rage("Accuracy","Hitchance")
 local autoStrafeSetting = ui.get("Misc", "General", "Movement", "Auto strafe")
+local slowMotionSetting = ui.get("Misc", "General", "Movement", "Slow motion key")
 
 local resetShot = false
 local resetAir = false
@@ -156,8 +157,7 @@ callbacks.register("predicted_move", function()
 end)
 callbacks.register("post_move", function(cmd) 
     if slowWalkFl:get()then
-        local sumVelocity = math.sqrt(xVelocity:get_float()*xVelocity:get_float()+yVelocity:get_float()*yVelocity:get_float())
-        if sumVelocity < 55 then
+        if slowMotionSetting:get_key() == true and not resetFl then
             originFl = flAmountSetting:get()
             flAmountSetting:set(slowWalkFlAmount:get()) 
             resetFl = true
