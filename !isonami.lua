@@ -86,7 +86,7 @@ fpsBoost:add_callback(function()
     client.log("fps boosted!")
 end)
 
-callbacks.register("paint", function()
+callbacksex.register("paint", function()
     resetPaint = not resetPaint
     if breakLegAnim:get() then
         if client.choked_commands() == 0 then
@@ -105,7 +105,7 @@ callbacks.register("paint", function()
     camIdealDist:set_value_int(thirdPersonDist:get())
 end)
 
-callbacks.register("predicted_move", function()
+callbacksex.register("predicted_move", function()
     if not client.is_alive() then
         return
     end
@@ -155,13 +155,13 @@ callbacks.register("predicted_move", function()
         return
     end
 end)
-callbacks.register("post_move", function(cmd) 
+callbacksex.register("post_move", function(cmd) 
     if slowWalkFl:get()then
         if slowMotionSetting:get_key() == true and not resetFl then
             originFl = flAmountSetting:get()
             flAmountSetting:set(slowWalkFlAmount:get()) 
             resetFl = true
-        elseif resetFl then
+        elseif resetFl and not slowMotionSetting:get_key() then
             flAmountSetting:set(originFl)
             resetFl = false
         else
@@ -171,7 +171,7 @@ callbacks.register("post_move", function(cmd)
 end)
 
 
-callbacks.register("weapon_fire",function(event)
+callbacksex.register("weapon_fire",function(event)
     local fireman = event:get_int("userid");
     local firemanIndex = engine.get_player_for_user_id(fireman);
     if firemanIndex == lP and not resetShot  then
@@ -192,4 +192,9 @@ callbacks.register("weapon_fire",function(event)
         shotTime = global_vars.tickcount + 15
         return
     end
+end)
+callbacksex.register("unload", function()
+    flAmountSetting:set(originFl)
+    flSetting:set(true)
+    hitChanceSetting:set(originHitChance)
 end)
