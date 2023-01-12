@@ -28,6 +28,8 @@ local thirdPersonDist = ui.add_slider("thirdPersonDist", 0, 200)
 local breakLegAnim = ui.add_checkbox("breakLegAnim")
 local airShot = ui.add_checkbox("airShot")
 local airHitChance = ui.add_slider("airHitChance",0,100)
+local slowWalkFl = ui.add_checkbox("slowWalkFl")
+local slowWalkFlAmount = ui.add_slider("slowWalkFlAmount",1,14)
 local fpsBoost = ui.add_button("fpsBoost")
 
 local lP = engine.get_local_player()
@@ -40,6 +42,7 @@ local m_fFlags = lPEntity:get_prop("DT_BasePlayer", "m_fFlags")
 
 
 local flSetting = ui.get("Rage", "Anti-aim", "Fake-lag", "Fake lag")
+local flAmountSetting = ui.get("Rage", "Anti-aim", "Fake-lag", "Fake lag amount")
 local desyncSetting = ui.get("Rage", "Anti-aim", "General", "Body yaw limit")
 local desyncSideSetting = ui.get("Rage", "Anti-aim", "General", "Fake yaw direction")
 local slideWalkSetting = ui.get("Misc", "General", "Movement", "Leg movement")
@@ -52,8 +55,10 @@ local airTime = 0
 local fakeTime = 0
 local resetPaint = false
 local resetTick = false
+local resetFl = false
 local shotTime = 0
 local originDesync = 0
+local originFl = 0
 local originHitChance = 0
 
 fpsBoost:add_callback(function()
@@ -116,7 +121,7 @@ callbacks.register("predicted_move", function()
     end
     if airShot:get()then
         local sumVelocity = math.sqrt(xVelocity:get_float()*xVelocity:get_float()+yVelocity:get_float()*yVelocity:get_float())
-        if sumVelocity > 15 then
+        if sumVelocity > 5 then
             autoStrafeSetting:set(true) 
         else
             autoStrafeSetting:set(false)--set autostrafe off
@@ -149,6 +154,22 @@ callbacks.register("predicted_move", function()
         return
     end
 end)
+callbacks.register("post_move", function(cmd) 
+    if slowWalkFl:get()then
+        local sumVelocity = math.sqrt(xVelocity:get_float()*xVelocity:get_float()+yVelocity:get_float()*yVelocity:get_float())
+        if sumVelocity < 55 then
+            originFl = flAmountSetting:get()
+            flAmountSetting:set(slowWalkFlAmount:get()) 
+            resetFl = true
+        elseif resetFl then
+            flAmountSetting:set(originFl)
+            resetFl = false
+        else
+            return
+        end
+    end
+end)
+
 
 callbacks.register("weapon_fire",function(event)
     local fireman = event:get_int("userid");
@@ -168,7 +189,7 @@ callbacks.register("weapon_fire",function(event)
             desyncSetting:set(0)--set desync 0
             flSetting:set(false)
         end
-        shotTime = global_vars.tickcount + 14
+        shotTime = global_vars.tickcount + 15
         return
     end
 end)
